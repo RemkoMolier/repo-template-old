@@ -1,0 +1,33 @@
+name: Initialize
+
+on:
+  push:
+
+permissions:
+  contents: read
+
+jobs:
+  defaults:
+    name: "Set up defaults"
+    runs-on: ubuntu-latest
+
+    steps:
+      - env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh auth status
+          gh extension install twelvelabs/gh-repo-config
+          gh repo-config apply
+        shell: bash
+
+  disable:
+    name: "Disable this workflow"
+    needs:
+      - defaults
+    runs-on: ubuntu-latest
+    steps:
+      - env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh workflow disable -R $GITHUB_REPOSITORY "${{ github.workflow }}"
+        shell: bash
